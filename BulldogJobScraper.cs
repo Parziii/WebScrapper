@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
+using Newtonsoft.Json;
 using RestSharp;
 namespace BulldogJob
 {
 	class BulldogJobScraper
 	{
-		public static IRestResponse<BulldogJobModel> ExecuteHttpRequest()
+		public static void ExecuteHttpRequest()
 		{
 			var client = new RestClient("https://bulldogjob.pl/graphql");
 			client.Timeout = -1;
@@ -28,14 +30,23 @@ namespace BulldogJob
 			request.AddParameter("application/json", body, ParameterType.RequestBody);
 
 			dynamic response = client.Execute(request);
-            Console.WriteLine(response.Content);
-			return response;
+
+			string json = response.Content;
+			json = json.Remove(0, 49);
+			json = json.Remove(json.Length-23);
+
+			var contentList = Model.FromJson(json);
+
+            foreach (var item in contentList)
+            {
+                Console.WriteLine(item.City);
+            }
 		}
 
-		public static void ModelMaker(IRestResponse<BulldogJobModel> response)
+		public static void ModelMaker(IRestResponse<Model> response)
         {
 			
-            var contentList = BulldogJobModel.FromJson(response.Content);
+            var contentList = Model.FromJson(response.Content);
 
             Console.WriteLine(contentList);
 

@@ -26,6 +26,8 @@ namespace JustJoinIT
             {
                 string jsonData = wc.DownloadString(baseUrl);
 
+                //Console.WriteLine(jsonData);
+
                 List<Welcome> welcomes = Welcome.FromJson(jsonData);
                 
                 

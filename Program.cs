@@ -10,10 +10,8 @@ namespace Scraper
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine("Hello World!");
 
-            
-            BulldogJobScraper.ModelMaker(BulldogJobScraper.ExecuteHttpRequest());
+            BulldogJobScraper.ExecuteHttpRequest();
 
 
             /*static async Task WriteToTxt() {
@@ -24,13 +22,13 @@ namespace Scraper
             */
 
 
-            /*
             
+            /*
             var justJoinItScraper = new JustJoinItScraper();
 
             justJoinItScraper.GetJJIOffers();
-            */
             
+            */
             
             
             /*var countryScraper = new CountryScraper();

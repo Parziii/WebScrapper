@@ -10,24 +10,7 @@
     using R = Newtonsoft.Json.Required;
     using N = Newtonsoft.Json.NullValueHandling;
 
-    public partial class BulldogJobModel
-    {
-        [J("data")] public Data Data { get; set; }
-    }
-
-    public partial class Data
-    {
-        [J("searchJobs")] public SearchJobs SearchJobs { get; set; }
-    }
-
-    public partial class SearchJobs
-    {
-        [J("totalCount")] public long TotalCount { get; set; }
-        [J("nodes")] public List<Node> Nodes { get; set; }
-        [J("__typename")] public string Typename { get; set; }
-    }
-
-    public partial class Node
+    public partial class Model
     {
         [J("id")] public string Id { get; set; }
         [J("company")] public Company Company { get; set; }
@@ -50,7 +33,7 @@
         [J("contractEmployment")] public bool ContractEmployment { get; set; }
         [J("contractOther")] public bool? ContractOther { get; set; }
         [J("locale")] public Locale Locale { get; set; }
-        [J("__typename")] public NodeTypename Typename { get; set; }
+        [J("__typename")] public ModelTypename Typename { get; set; }
     }
 
     public partial class Company
@@ -119,7 +102,7 @@
 
     public enum Locale { En, Pl };
 
-    public enum City { Ateny, Athens, Białystok, BielskoBiala, BielskoBiała, Bydgoszcz, Częstochowa, Eindhoven, Gdańsk, Gdynia, Gliwice, Gżira, JelczLaskowice, Katowice, Kielce, KonstancinJeziorna, Krakow, Kraków, Limassol, Lublin, Odense, Olsztyn, Opole, OstrówWielkopolski, Piła, Poznań, Rzeszów, Sosnowiec, StarogardGdański, Stockholm, Stryków, SzczawnoZdrój, Szczecin, Sztokholm, Tbilisi, Toruń, Ulm, Warsaw, Warszawa, Wałbrzych, Wrocław, Zabierzów, ZielonaGóra, Zielonka, Łódź };
+    public enum City { Anif, Ateny, Athens, Berlin, Białystok, BielskoBiala, BielskoBiała, Brno, Bydgoszcz, Częstochowa, Gdańsk, Gdynia, Gliwice, Gostyń, Gżira, Katowice, KemptenAllgäu, Kielce, KonstancinJeziorna, Koszalin, Krakow, Kraków, Limassol, London, Londyn, Lublin, Pabianice, Paris, Paryż, Pieńków, Piła, Poznań, Praga, Prague, Płock, Rzeszów, Salzburg, Sosnowiec, StarogardGdański, Stockholm, Szczecin, Sztokholm, Tajęcina, Tbilisi, Toruń, Ulm, Warsaw, Warszawa, Wrocław, Zabierzów, ZielonaGóra, Zielonka, Łódź };
 
     public enum FluffyTypename { Location };
 
@@ -133,20 +116,19 @@
 
     public enum TechnologyTypename { Technology };
 
-    public enum NodeTypename { Job };
+    public enum ModelTypename { Job };
 
-    public partial class BulldogJobModel
+    public partial class Model
     {
-        public static List<BulldogJobModel> FromJson(string json)
+        public static List<Model> FromJson(string json)
         {
-
-            return JsonConvert.DeserializeObject<List<BulldogJobModel>>(json, BulldogJob.Converter.Settings);
+            return JsonConvert.DeserializeObject<List<Model>>(json, BulldogJob.Converter.Settings);
         }
     }
 
     public static class Serialize
     {
-        public static string ToJson(this BulldogJobModel self)
+        public static string ToJson(this List<Model> self)
         {
             return JsonConvert.SerializeObject(self, BulldogJob.Converter.Settings);
         }
@@ -160,7 +142,7 @@
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
-                NodeTypenameConverter.Singleton,
+                ModelTypenameConverter.Singleton,
                 CompanyTypenameConverter.Singleton,
                 EnvironmentTypenameConverter.Singleton,
                 JobCoverTypenameConverter.Singleton,
@@ -180,11 +162,11 @@
         };
     }
 
-    internal class NodeTypenameConverter : JsonConverter
+    internal class ModelTypenameConverter : JsonConverter
     {
         public override bool CanConvert(Type t)
         {
-            return t == typeof(NodeTypename) || t == typeof(NodeTypename?);
+            return t == typeof(ModelTypename) || t == typeof(ModelTypename?);
         }
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
@@ -193,9 +175,9 @@
             var value = serializer.Deserialize<string>(reader);
             if (value == "Job")
             {
-                return NodeTypename.Job;
+                return ModelTypename.Job;
             }
-            throw new Exception("Cannot unmarshal type NodeTypename");
+            throw new Exception("Cannot unmarshal type ModelTypename");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -205,16 +187,16 @@
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (NodeTypename)untypedValue;
-            if (value == NodeTypename.Job)
+            var value = (ModelTypename)untypedValue;
+            if (value == ModelTypename.Job)
             {
                 serializer.Serialize(writer, "Job");
                 return;
             }
-            throw new Exception("Cannot marshal type NodeTypename");
+            throw new Exception("Cannot marshal type ModelTypename");
         }
 
-        public static readonly NodeTypenameConverter Singleton = new NodeTypenameConverter();
+        public static readonly ModelTypenameConverter Singleton = new ModelTypenameConverter();
     }
 
     internal class CompanyTypenameConverter : JsonConverter
@@ -594,74 +576,92 @@
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "Anif":
+                    return City.Anif;
                 case "Ateny":
                     return City.Ateny;
                 case "Athens":
                     return City.Athens;
+                case "Berlin":
+                    return City.Berlin;
                 case "Białystok":
                     return City.Białystok;
                 case "Bielsko-Biala":
                     return City.BielskoBiala;
                 case "Bielsko-Biała":
                     return City.BielskoBiała;
+                case "Brno":
+                    return City.Brno;
                 case "Bydgoszcz":
                     return City.Bydgoszcz;
                 case "Częstochowa":
                     return City.Częstochowa;
-                case "Eindhoven":
-                    return City.Eindhoven;
                 case "Gdańsk":
                     return City.Gdańsk;
                 case "Gdynia":
                     return City.Gdynia;
                 case "Gliwice":
                     return City.Gliwice;
+                case "Gostyń":
+                    return City.Gostyń;
                 case "Gżira":
                     return City.Gżira;
-                case "Jelcz Laskowice":
-                    return City.JelczLaskowice;
                 case "Katowice":
                     return City.Katowice;
+                case "Kempten (Allgäu)":
+                    return City.KemptenAllgäu;
                 case "Kielce":
                     return City.Kielce;
                 case "Konstancin-Jeziorna":
                     return City.KonstancinJeziorna;
+                case "Koszalin":
+                    return City.Koszalin;
                 case "Krakow":
                     return City.Krakow;
                 case "Kraków":
                     return City.Kraków;
                 case "Limassol":
                     return City.Limassol;
+                case "London":
+                    return City.London;
+                case "Londyn":
+                    return City.Londyn;
                 case "Lublin":
                     return City.Lublin;
-                case "Odense":
-                    return City.Odense;
-                case "Olsztyn":
-                    return City.Olsztyn;
-                case "Opole":
-                    return City.Opole;
-                case "Ostrów Wielkopolski":
-                    return City.OstrówWielkopolski;
+                case "Pabianice":
+                    return City.Pabianice;
+                case "Paris":
+                    return City.Paris;
+                case "Paryż":
+                    return City.Paryż;
+                case "Pieńków":
+                    return City.Pieńków;
                 case "Piła":
                     return City.Piła;
                 case "Poznań":
                     return City.Poznań;
+                case "Praga":
+                    return City.Praga;
+                case "Prague":
+                    return City.Prague;
+                case "Płock":
+                    return City.Płock;
                 case "Rzeszów":
                     return City.Rzeszów;
+                case "Salzburg":
+                    return City.Salzburg;
                 case "Sosnowiec":
                     return City.Sosnowiec;
                 case "Starogard Gdański":
                     return City.StarogardGdański;
                 case "Stockholm":
                     return City.Stockholm;
-                case "Stryków":
-                    return City.Stryków;
-                case "Szczawno-Zdrój":
-                    return City.SzczawnoZdrój;
                 case "Szczecin":
                     return City.Szczecin;
                 case "Sztokholm":
                     return City.Sztokholm;
+                case "Tajęcina":
+                    return City.Tajęcina;
                 case "Tbilisi":
                     return City.Tbilisi;
                 case "Toruń":
@@ -672,8 +672,6 @@
                     return City.Warsaw;
                 case "Warszawa":
                     return City.Warszawa;
-                case "Wałbrzych":
-                    return City.Wałbrzych;
                 case "Wrocław":
                     return City.Wrocław;
                 case "Zabierzów":
@@ -685,7 +683,7 @@
                 case "Łódź":
                     return City.Łódź;
             }
-            throw new Exception("Cannot unmarshal type City");
+            return null;
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -698,11 +696,17 @@
             var value = (City)untypedValue;
             switch (value)
             {
+                case City.Anif:
+                    serializer.Serialize(writer, "Anif");
+                    return;
                 case City.Ateny:
                     serializer.Serialize(writer, "Ateny");
                     return;
                 case City.Athens:
                     serializer.Serialize(writer, "Athens");
+                    return;
+                case City.Berlin:
+                    serializer.Serialize(writer, "Berlin");
                     return;
                 case City.Białystok:
                     serializer.Serialize(writer, "Białystok");
@@ -713,14 +717,14 @@
                 case City.BielskoBiała:
                     serializer.Serialize(writer, "Bielsko-Biała");
                     return;
+                case City.Brno:
+                    serializer.Serialize(writer, "Brno");
+                    return;
                 case City.Bydgoszcz:
                     serializer.Serialize(writer, "Bydgoszcz");
                     return;
                 case City.Częstochowa:
                     serializer.Serialize(writer, "Częstochowa");
-                    return;
-                case City.Eindhoven:
-                    serializer.Serialize(writer, "Eindhoven");
                     return;
                 case City.Gdańsk:
                     serializer.Serialize(writer, "Gdańsk");
@@ -731,20 +735,26 @@
                 case City.Gliwice:
                     serializer.Serialize(writer, "Gliwice");
                     return;
+                case City.Gostyń:
+                    serializer.Serialize(writer, "Gostyń");
+                    return;
                 case City.Gżira:
                     serializer.Serialize(writer, "Gżira");
                     return;
-                case City.JelczLaskowice:
-                    serializer.Serialize(writer, "Jelcz Laskowice");
-                    return;
                 case City.Katowice:
                     serializer.Serialize(writer, "Katowice");
+                    return;
+                case City.KemptenAllgäu:
+                    serializer.Serialize(writer, "Kempten (Allgäu)");
                     return;
                 case City.Kielce:
                     serializer.Serialize(writer, "Kielce");
                     return;
                 case City.KonstancinJeziorna:
                     serializer.Serialize(writer, "Konstancin-Jeziorna");
+                    return;
+                case City.Koszalin:
+                    serializer.Serialize(writer, "Koszalin");
                     return;
                 case City.Krakow:
                     serializer.Serialize(writer, "Krakow");
@@ -755,20 +765,26 @@
                 case City.Limassol:
                     serializer.Serialize(writer, "Limassol");
                     return;
+                case City.London:
+                    serializer.Serialize(writer, "London");
+                    return;
+                case City.Londyn:
+                    serializer.Serialize(writer, "Londyn");
+                    return;
                 case City.Lublin:
                     serializer.Serialize(writer, "Lublin");
                     return;
-                case City.Odense:
-                    serializer.Serialize(writer, "Odense");
+                case City.Pabianice:
+                    serializer.Serialize(writer, "Pabianice");
                     return;
-                case City.Olsztyn:
-                    serializer.Serialize(writer, "Olsztyn");
+                case City.Paris:
+                    serializer.Serialize(writer, "Paris");
                     return;
-                case City.Opole:
-                    serializer.Serialize(writer, "Opole");
+                case City.Paryż:
+                    serializer.Serialize(writer, "Paryż");
                     return;
-                case City.OstrówWielkopolski:
-                    serializer.Serialize(writer, "Ostrów Wielkopolski");
+                case City.Pieńków:
+                    serializer.Serialize(writer, "Pieńków");
                     return;
                 case City.Piła:
                     serializer.Serialize(writer, "Piła");
@@ -776,8 +792,20 @@
                 case City.Poznań:
                     serializer.Serialize(writer, "Poznań");
                     return;
+                case City.Praga:
+                    serializer.Serialize(writer, "Praga");
+                    return;
+                case City.Prague:
+                    serializer.Serialize(writer, "Prague");
+                    return;
+                case City.Płock:
+                    serializer.Serialize(writer, "Płock");
+                    return;
                 case City.Rzeszów:
                     serializer.Serialize(writer, "Rzeszów");
+                    return;
+                case City.Salzburg:
+                    serializer.Serialize(writer, "Salzburg");
                     return;
                 case City.Sosnowiec:
                     serializer.Serialize(writer, "Sosnowiec");
@@ -788,17 +816,14 @@
                 case City.Stockholm:
                     serializer.Serialize(writer, "Stockholm");
                     return;
-                case City.Stryków:
-                    serializer.Serialize(writer, "Stryków");
-                    return;
-                case City.SzczawnoZdrój:
-                    serializer.Serialize(writer, "Szczawno-Zdrój");
-                    return;
                 case City.Szczecin:
                     serializer.Serialize(writer, "Szczecin");
                     return;
                 case City.Sztokholm:
                     serializer.Serialize(writer, "Sztokholm");
+                    return;
+                case City.Tajęcina:
+                    serializer.Serialize(writer, "Tajęcina");
                     return;
                 case City.Tbilisi:
                     serializer.Serialize(writer, "Tbilisi");
@@ -814,9 +839,6 @@
                     return;
                 case City.Warszawa:
                     serializer.Serialize(writer, "Warszawa");
-                    return;
-                case City.Wałbrzych:
-                    serializer.Serialize(writer, "Wałbrzych");
                     return;
                 case City.Wrocław:
                     serializer.Serialize(writer, "Wrocław");
